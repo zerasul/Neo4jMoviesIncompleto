@@ -43,9 +43,8 @@ function findMovie ($title) {
 	include("../connection.php");
 
 	// Setup a query that return the movie and the path (movie-rel->person) of the movie with persons for all the relations
-	/**********
-	*** YOUR CODE HERE
-	**********/
+	$cypher = "match(m:Movie) WHERE m.title = '$title' RETURN m";
+
 
 	// Run the query
 	/**********
