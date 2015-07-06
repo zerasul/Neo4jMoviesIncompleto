@@ -1,7 +1,13 @@
 <?php
-	$connection = null;
+	use Neoxygen\NeoClient\ClientBuilder;
 
-	/**********
-	*** YOUR CODE HERE
-	**********/
+	require "vendor/autoload.php";
+
+	$connection = ClientBuilder::create()
+		    ->addConnection('default','http','localhost',7474)
+		    ->setAutoFormatResponse(true)
+		    ->build();
+
+
+	
 ?>

@@ -43,40 +43,35 @@ function findMovie ($title) {
 	include("../connection.php");
 
 	// Setup a query that return the movie and the path (movie-rel->person) of the movie with persons for all the relations
-	$cypher = "match(m:Movie) WHERE m.title = '$title' RETURN m";
+	$cypher = "match(m:Movie) WHERE m.title = '".$title."' RETURN m";
 
 
 	// Run the query
-	/**********
-	*** YOUR CODE HERE
-	**********/
-
+	$params = array("the_title" => $title);
+	//var_dump($params);
+	$res = $connection->sendCypherQuery($cypher,$params)->getResult();
+	//var_dump($res);
 	// Obtain the movie nodes from the result
-	/**********
-	*** YOUR CODE HERE
-	**********/
+	$movie = $res->getSingleNode();
+	//var_dump($movie);
 
 	// Setup on the array of results the values of title, released and tagline of the movie
-	$data['title'] = null;
-	$data['released'] = null;
-	$data['tagline'] = null;
+	$data['title'] = $movie->getProperty('title');
+	$data['released'] = $movie->getProperty('released');
+	$data['tagline'] = $movie->getProperty('tagline');
 
-	/**********
-	*** YOUR CODE HERE
-	**********/
-
+	
 	// 1. Obtaing the cast of the movie
 	// Obtain the relationships ACTED_IN from the resultset
 	$actorRels = $movie->getRelationships('ACTED_IN');
-
+	$actorsArray=array();
 	// Build and array of actors iterating through the relations getting the start node properties of each relation
 	foreach ($actorRels as $actorRel) {
-		$theActor['name'] = null;
-		$theActor['born'] = null;
+		$actor = $actorRel->getEndNode();
+		$theActor['name'] = $actor->getProperty('name');
+		$theActor['born'] = $actor->getProperty('born');
 
-		/**********
-		*** YOUR CODE HERE
-		**********/
+		
 
 		$actorsArray[] = $theActor;
 	}
@@ -86,14 +81,14 @@ function findMovie ($title) {
 
 	// 2. Obtaing the directors of the movie 
 	// Obtain the relationships DIRECTED from the resultset
-	/**********
-	*** YOUR CODE HERE
-	**********/
-
+	
+	$directors = $movie->getRelationShips('DIRECTED');
+	$directorsArray=array();
 	// Build and array of directors iterating through the relations getting the start node properties of each relation
 	foreach ($directors as $director) {
-		$theDirector['name'] = null;
-		$theDirector['born'] = null;
+		$persondirector = $director->getEndNode();
+		$theDirector['name'] = $persondirector->getProperty('name');
+		$theDirector['born'] = $persondirector->getProperty('born');
 
 		/**********
 		*** YOUR CODE HERE
@@ -110,11 +105,13 @@ function findMovie ($title) {
 	/**********
 	*** YOUR CODE HERE
 	**********/
-
+	$producers = $movie->getRelationShips('PRODUCED');
+	$producerArray=array();
 	// Build and array of producers iterating through the relations getting the start node properties of each relation
 	foreach ($producers as $producer) {
-		$theDirector['name'] = null;
-		$theDirector['born'] = null;
+		$prod = $producer->getEndNode();
+		$theProducer['name'] = $prod->getProperty('name');
+		$theProducer['born'] = $prod->getProperty('born');
 
 		/**********
 		*** YOUR CODE HERE
@@ -140,27 +137,20 @@ function findActor ($name) {
 	include("../connection.php");
 
 	// Setup a query that return the person 
-	/**********
-	*** YOUR CODE HERE
-	**********/
+	$cypher = "match(p:Person) WHERE p.name='".$name."' RETURN p";
 	
 	// Run the query
-	/**********
-	*** YOUR CODE HERE
-	**********/
+	$params=array('the_name' => $name);
+	$res = $connection->sendCypherQuery($cypher,$params)->getResult();
+
 
 	//Obtain the node returned by the query from the resultset
-	/**********
-	*** YOUR CODE HERE
-	**********/
+	$person=$res->getSingleNode();
 
 	// Add to the result array the name and the born year of the actor
-	$data['name'] = null;
-	$data['born'] = null;
+	$data['name'] = $person->getProperty('name');
+	$data['born'] = $person->getProperty('born');
 
-	/**********
-	*** YOUR CODE HERE
-	**********/
 
 	// Return the result as JSON
 	echo json_encode($data);
@@ -187,37 +177,30 @@ function findFilmography ($name) {
 	include("../connection.php");
 
 	// Setup a query that return the movie and the path (movie-[:ACTED_IN]->person) of the movie with all its actors
-	/**********
-	*** YOUR CODE HERE
-	**********/
+	$cypher = "match(p:Person) WHERE p.name='".$name."' RETURN p";
 
 	//Run the query and assign the result
-	/**********
-	*** YOUR CODE HERE
-	**********/
+	$res = $connection->sendCypherQuery($cypher)->getResult();
 
 	// Obtain the movie path from the resultset
-	/**********
-	*** YOUR CODE HERE
-	**********/
+	$person = $res->getSingleNode();
 
 	// Add to the result array the name and the born year of the actor
-	$data['name'] = null;
-	$data['born'] = null;
+	$data['name'] = $person->getProperty('name');
+	$data['born'] = $person->getProperty('born');
 
 	/**********
 	*** YOUR CODE HERE
 	**********/
 
 	// Obtain the relationships ACTED_IN from the resultset
-	/**********
-	*** YOUR CODE HERE
-	**********/
-
+	$movieRels = $person->getRelationShips('ACTED_IN');
+	$movieArray=array();
 	// Build and array of movies iterating through the relations getting the end node properties of each relation
 	foreach ($movieRels as $movieRel) {
-		$theMovie['title'] = null;
-		$theMovie['released'] = null;
+		$themovie = $movieRel->getEndNode();
+		$theMovie['title'] = $themovie->getProperty('title');
+		$theMovie['released'] = $themovie->getProperty('released');
 
 		/**********
 		*** YOUR CODE HERE
